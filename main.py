@@ -52,6 +52,7 @@ def processUploadFiles(filename,filesize,files,update,bot,message,thread=None,jd
     try:
         bot.editMessageText(message, 'logueado')
         bot.editMessageText(message,'🤜Preparando Para Subir☁...')
+        bot.editMessageText(message, 'logueado')
         evidence = None
         fileid = None
         user_info = jdb.get_user(update.message.sender.username)
