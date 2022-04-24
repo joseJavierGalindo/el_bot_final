@@ -1,4 +1,4 @@
-from pyobigram.utils import sizeof_fmt,get_file_size,createID,nice_time
+﻿from pyobigram.utils import sizeof_fmt,get_file_size,createID,nice_time
 from pyobigram.client import ObigramClient,inlineQueryResultArticle
 from MoodleClient import MoodleClient
 
@@ -63,101 +63,55 @@ def processUploadFiles(filename,filesize,files,update,bot,message,thread=None,jd
                                   user_info['moodle_repo_id'],
                                   proxy=proxy)
             loged = client.login()
+            itererr = 0
+            if loged:
+                if user_info['uploadtype'] == 'evidence':
+                    evidences = client.getEvidences()
+                    evidname = str(filename).split('.')[0]
+                    for evid in evidences:
+                        if evid['name'] == evidname:
+                            evidence = evid
+                            break
+                    if evidence is None:
+                        evidence = client.createEvidence(evidname)
 
-            #mio
-            bot.editMessageText(message, 'logueado')
-
-
-
-            #miTRY
-            try:
-                a=0
-
-                itererr = 0
-                if loged:
-                    if user_info['uploadtype'] == 'evidence':
-                        evidences = client.getEvidences()
-                        evidname = str(filename).split('.')[0]
-                        for evid in evidences:
-                            if evid['name'] == evidname:
-                                evidence = evid
-                                break
-                        if evidence is None:
-                            evidence = client.createEvidence(evidname)
-
-                    originalfile = ''
-                    if len(files) > 1:
-                        originalfile = filename
-                    draftlist = []
-                    for f in files:
-                        f_size = get_file_size(f)
-                        resp = None
-                        iter = 0
-                        tokenize = False
-                        if user_info['tokenize'] != 0:
-                            tokenize = True
-                        while resp is None:
-                            if user_info['uploadtype'] == 'evidence':
-                                fileid, resp = client.upload_file(f, evidence, fileid, progressfunc=uploadFile,
-                                                                  args=(bot, message, originalfile, thread),
-                                                                  tokenize=tokenize)
-                            if user_info['uploadtype'] == 'draft':
-                                # mio
-                                bot.editMessageText(message, 'entro')
-
-                                fileid, resp = client.upload_file_draft(f, progressfunc=uploadFile,
-                                                                        args=(bot, message, originalfile, thread),
-                                                                        tokenize=tokenize)
-                                draftlist.append(resp)
-                                # mio
-                                bot.editMessageText(message, 'salio')
-
-                            if user_info['uploadtype'] == 'perfil':
-                                fileid, resp = client.upload_file_perfil(f, progressfunc=uploadFile,
-                                                                         args=(bot, message, originalfile, thread),
-                                                                         tokenize=tokenize)
-                                draftlist.append(resp)
-                            if user_info['uploadtype'] == 'blog':
-                                fileid, resp = client.upload_file_blog(f, progressfunc=uploadFile,
-                                                                       args=(bot, message, originalfile, thread),
-                                                                       tokenize=tokenize)
-                                draftlist.append(resp)
-                            if user_info['uploadtype'] == 'calendar':
-                                fileid, resp = client.upload_file_calendar(f, progressfunc=uploadFile,
-                                                                           args=(bot, message, originalfile, thread),
-                                                                           tokenize=tokenize)
-                                draftlist.append(resp)
-                            iter += 1
-                            if iter >= 10:
-                                break
-                        os.unlink(f)
-                    if user_info['uploadtype'] == 'evidence':
-                        try:
-                            client.saveEvidence(evidence)
-                        except:
-                            pass
-                    return draftlist
-
-
-            except Exception as ex:
-                bot.editMessageText(message,f'❌Error {str(ex)}❌')
-
-            #fin de mi tray
-
-
-
-
-
-
-
-
-
+                originalfile = ''
+                if len(files)>1:
+                    originalfile = filename
+                draftlist = []
+                for f in files:
+                    f_size = get_file_size(f)
+                    resp = None
+                    iter = 0
+                    tokenize = False
+                    if user_info['tokenize']!=0:
+                       tokenize = True
+                    while resp is None:
+                          if user_info['uploadtype'] == 'evidence':
+                             fileid,resp = client.upload_file(f,evidence,fileid,progressfunc=uploadFile,args=(bot,message,originalfile,thread),tokenize=tokenize)
+                          if user_info['uploadtype'] == 'draft':
+                             fileid,resp = client.upload_file_draft(f,progressfunc=uploadFile,args=(bot,message,originalfile,thread),tokenize=tokenize)
+                             draftlist.append(resp)
+                          if user_info['uploadtype'] == 'perfil':
+                             fileid,resp = client.upload_file_perfil(f,progressfunc=uploadFile,args=(bot,message,originalfile,thread),tokenize=tokenize)
+                             draftlist.append(resp)
+                          if user_info['uploadtype'] == 'blog':
+                             fileid,resp = client.upload_file_blog(f,progressfunc=uploadFile,args=(bot,message,originalfile,thread),tokenize=tokenize)
+                             draftlist.append(resp)
+                          if user_info['uploadtype'] == 'calendar':
+                             fileid,resp = client.upload_file_calendar(f,progressfunc=uploadFile,args=(bot,message,originalfile,thread),tokenize=tokenize)
+                             draftlist.append(resp)
+                          iter += 1
+                          if iter>=10:
+                              break
+                    os.unlink(f)
+                if user_info['uploadtype'] == 'evidence':
+                    try:
+                        client.saveEvidence(evidence)
+                    except:pass
+                return draftlist
             else:
                 bot.editMessageText(message,'❌Error En La Pagina❌')
-
-
-
-
         elif cloudtype == 'cloud':
             tokenize = False
             if user_info['tokenize']!=0:
