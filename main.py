@@ -50,6 +50,7 @@ def uploadFile(filename,currentBits,totalBits,speed,time,args):
 
 def processUploadFiles(filename,filesize,files,update,bot,message,thread=None,jdb=None):
     try:
+        bot.editMessageText(message, 'logueado')
         bot.editMessageText(message,'🤜Preparando Para Subir☁...')
         evidence = None
         fileid = None
